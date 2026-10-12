@@ -230,32 +230,34 @@ public class GuardAIController : MonoBehaviour
 
 
 
-    private void OnDrawGizmosSelected()
-    {
-        if (waypoints == null)
-            return;
+    //private void OnDrawGizmosSelected()
+    //{
+    //    if (waypoints == null)
+    //        return;
 
-        Gizmos.color = Color.cyan;
-        for (int i = 0; i < waypoints.Length; i++)
-        {
-            if (waypoints[i] == null)
-            {
-                continue;
-            }
+    //    Gizmos.color = Color.cyan;
+    //    for (int i = 0; i < waypoints.Length; i++)
+    //    {
+    //        if (waypoints[i] == null)
+    //        {
+    //            continue;
+    //        }
 
-            Transform next = waypoints[(i + 1) % waypoints.Length];
-            Gizmos.DrawSphere(waypoints[i].position, 0.2f);
-            if (next != null)
-            {
-                Gizmos.DrawLine(waypoints[i].position, next.position);
-            }
-        }
-    }
+    //        Transform next = waypoints[(i + 1) % waypoints.Length];
+    //        Gizmos.DrawSphere(waypoints[i].position, 0.2f);
+    //        if (next != null)
+    //        {
+    //            Gizmos.DrawLine(waypoints[i].position, next.position);
+    //        }
+    //    }
+    //}
 
     void Stop()
     {
         rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
         animator.SetFloat(speedHash, 0f);
+
+        GameManager.instance.Lose();
     }
 
    
