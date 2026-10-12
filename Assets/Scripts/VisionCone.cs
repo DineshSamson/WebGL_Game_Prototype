@@ -34,6 +34,8 @@ public class VisionCone : MonoBehaviour
       //  Debug.Log("rayCount = " + rayCount + ", triangles length = " + triangles.Length);
         mesh.vertices = vertices;
         mesh.triangles = triangles;
+
+      
     }
 
     private void LateUpdate()
@@ -62,10 +64,13 @@ public class VisionCone : MonoBehaviour
             Vector3 local = transform.InverseTransformPoint(point);
             local.y = floorOffset;
             vertices[i + 1] = local;
+            //Debug.DrawRay(origin, dir * guard.viewRange, Color.green);
         }
 
         mesh.vertices = vertices;
         mesh.RecalculateBounds();
+
+       
     }
 
     public void SetColor(Color color)
