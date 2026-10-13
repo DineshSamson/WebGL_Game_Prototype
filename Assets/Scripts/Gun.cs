@@ -3,7 +3,7 @@ using UnityEngine.Pool;
 
 public class Gun : MonoBehaviour
 {
-    [SerializeField] Bullet bulletPrefab;
+    [SerializeField] Bullet[] bullets;
     [SerializeField] Transform firePoint;
     public float fireInterval = 2f;
 
@@ -16,20 +16,12 @@ public class Gun : MonoBehaviour
     [SerializeField] float lockTime = 0.4f;
     [SerializeField] float range = 15f;
 
-    private void Awake()
+    private void Start()
     {
-        pool = new ObjectPool<Bullet>(
-            createFunc: () =>
-            {
-                var b = Instantiate(bulletPrefab);
-                b.Init(x => pool.Release(x));
-                return b;
-            },
-            actionOnGet: null,
-            actionOnRelease: b => b.gameObject.SetActive(false),
-            actionOnDestroy: b => Destroy(b.gameObject),
-            defaultCapacity: 10, maxSize: 20);
-
+        for(int i = 0; i < bullets.Length; i++) 
+        {
+            bullets[i].enabled = false;
+        }
     }
 
     private void Update()
@@ -52,6 +44,18 @@ public class Gun : MonoBehaviour
             return;
 
         nextFireTime = Time.time + fireInterval;
-        pool.Get().Fire(firePoint.position, firePoint.forward);
+        Shoot();
+    }
+
+    void Shoot()
+    {
+        for(int i =0;  i < bullets.Length; i++)
+        {
+            if (!bullets[i].gameObject.activeSelf) 
+            {
+                bullets[i].Fire(firePoint.position, firePoint.forward);
+                return;
+            }
+        }
     }
 }

@@ -42,25 +42,7 @@ public class PlayerController : MonoBehaviour
         if(floor.Raycast(ray, out float distance))
             aimPoint = ray.GetPoint(distance);
     
-        animator.SetFloat(SpeedHash, moving ? 1f: 0f, 0.1f, Time.deltaTime);
-        //Debug.DrawLine(transform.position, aimPoint, Color.red);
-        /*
-        moveInput = new Vector3(Input.GetAxisRaw("Horizontal"), 0f, Input.GetAxisRaw("Vertical"));
-    if(moveInput.sqrMagnitude > 1f)
-    {
-        moveInput.Normalize();
-    }
-
-    Plane floor = new Plane(Vector3.up, transform.position);
-    Ray ray = cam.ScreenPointToRay(Input.mousePosition);
-
-    if(floor.Raycast(ray, out float distance))
-    {
-        aimPoint = ray.GetPoint(distance);
-    }
-
-    animator.SetFloat(SpeedHash, moveInput.magnitude, 0.1f, Time.deltaTime);
-    */
+        animator.SetFloat(SpeedHash, moving ? 1f: 0f, 0.1f, Time.deltaTime);    
     }
 
     private void FixedUpdate()
@@ -72,26 +54,9 @@ public class PlayerController : MonoBehaviour
         {
             Quaternion look = Quaternion.LookRotation(dir);
             rb.MoveRotation(Quaternion.RotateTowards(rb.rotation, look, turnSpeed * Time.fixedDeltaTime));
-            //transform.rotation = Quaternion.RotateTowards(transform.rotation, look, turnSpeed * Time.fixedDeltaTime);
         }
 
         Vector3 v = moving ? transform.forward * speed : Vector3.zero;
         rb.linearVelocity = new Vector3(v.x, rb.linearVelocity.y, v.z);
-        //Debug.Log("aim " + aimPoint + "  dist " + (aimPoint - rb.position).magnitude + "  turn " + turnSpeed);
-
-        /*
-        Vector3 v = moveInput * speed;
-
-        rb.linearVelocity = new Vector3(v.x, rb.linearVelocity.y, v.z);
-
-        Vector3 dir = aimPoint - transform.position;
-        dir.y = 0f;
-
-        if(dir.sqrMagnitude > 0.01f)
-        {
-            Quaternion look = Quaternion.LookRotation(dir); 
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, look, turnSpeed * Time.fixedDeltaTime);
-        }
-        */
     }
 }

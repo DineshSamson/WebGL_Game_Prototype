@@ -1,4 +1,3 @@
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class GuardAIController : MonoBehaviour
@@ -16,7 +15,7 @@ public class GuardAIController : MonoBehaviour
 
     public float patrolSpeed = 2f;
     public float chaseSpeed = 4f;
-    public float turnSpeed = -180f;
+    public float turnSpeed = 180f;
     public float wallCheckDistance = 1.5f;
 
     public float catchDistance = 1f;
@@ -28,6 +27,7 @@ public class GuardAIController : MonoBehaviour
     int index;
     Rigidbody rb;
     float cosHalfAngle;
+    float cachedViewAngle = -1f;
     Vector3 lastSeenPos;
     float loseTimer;
     float searchTimer;
@@ -43,7 +43,7 @@ public class GuardAIController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
 
-        cosHalfAngle = Mathf.Cos(viewAngle * 0.5f * Mathf.Deg2Rad);
+        //cosHalfAngle = Mathf.Cos(viewAngle * 0.5f * Mathf.Deg2Rad);
     }
 
     private void Start()
@@ -72,8 +72,6 @@ public class GuardAIController : MonoBehaviour
                 Chase();
                 break;
         }
-
-        //visionCone.SetColor(cansee)
     }
 
     void Patrol()
@@ -87,13 +85,14 @@ public class GuardAIController : MonoBehaviour
 
         if (waypoints == null || waypoints.Length == 0)
         {
-            Stop(); return;
+            Stop(); 
+            return;
         }
 
         Vector3 toWaypoin = waypoints[index].position - transform.position;
         toWaypoin.y = 0;
 
-        if(toWaypoin.magnitude < 0.5f)
+        if(toWaypoin.magnitude < 0.25f)
         {
             index = (index + 1) % waypoints.Length;
             return;
@@ -123,10 +122,11 @@ public class GuardAIController : MonoBehaviour
 
         Vector3 toPlayer = player.position - transform.position;
         toPlayer.y = 0;
-        if(toPlayer.magnitude <= catchDistance)
+        if(toPlayer.magnitude <= catchDistance * catchDistance)
         {
             caught = true;
-            Debug.Log("Player Caught!");
+            GameManager.instance.Lose();
+            //Debug.Log("Player Caught!");
         }
     }
 
@@ -142,7 +142,7 @@ public class GuardAIController : MonoBehaviour
         Vector3 toSpot = lastSeenPos - transform.position;
         toSpot.y = 0;
 
-        if(toSpot.magnitude > 0.5f)
+        if(toSpot.magnitude > 0.25f)
         {
             MoveTowards(lastSeenPos, patrolSpeed);
         }
@@ -191,6 +191,12 @@ public class GuardAIController : MonoBehaviour
         if (toPlayer.sqrMagnitude > viewRange * viewRange)
             return false;
 
+        if(!Mathf.Approximately(cachedViewAngle, viewAngle))
+        {
+            cachedViewAngle = viewAngle;
+            cosHalfAngle = Mathf.Cos(viewAngle * 0.5f * Mathf.Deg2Rad);
+        }
+
         if (Vector3.Dot(transform.forward, toPlayer.normalized) < cosHalfAngle)
             return false;
 
@@ -208,9 +214,9 @@ public class GuardAIController : MonoBehaviour
         Vector3 dir = target - transform.position;
         dir.y = 0;
 
-        if (dir.magnitude < 0.5f)
+        if (dir.magnitude < 0.25f)
         {
-            index = (index + 1) % waypoints.Length;
+            Stop();
             return;
         }
         dir.Normalize();
@@ -228,37 +234,9 @@ public class GuardAIController : MonoBehaviour
         animator.SetFloat(speedHash, 1f);
     }
 
-
-
-    //private void OnDrawGizmosSelected()
-    //{
-    //    if (waypoints == null)
-    //        return;
-
-    //    Gizmos.color = Color.cyan;
-    //    for (int i = 0; i < waypoints.Length; i++)
-    //    {
-    //        if (waypoints[i] == null)
-    //        {
-    //            continue;
-    //        }
-
-    //        Transform next = waypoints[(i + 1) % waypoints.Length];
-    //        Gizmos.DrawSphere(waypoints[i].position, 0.2f);
-    //        if (next != null)
-    //        {
-    //            Gizmos.DrawLine(waypoints[i].position, next.position);
-    //        }
-    //    }
-    //}
-
     void Stop()
     {
         rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
         animator.SetFloat(speedHash, 0f);
-
-        GameManager.instance.Lose();
     }
-
-   
 }

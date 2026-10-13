@@ -101,7 +101,7 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < guards.Length; i++)
         {
             guards[i].patrolSpeed = 3;
-            guards[i].viewRange = 6;
+            guards[i].viewRange = 8;
         }
 
         gun.fireInterval = 1.5f;
